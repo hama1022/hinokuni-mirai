@@ -46,7 +46,15 @@ const categoryColors: Record<string, string> = {
       <span class="text-gray-600 truncate">{news.title}</span>
     </nav>
 
-    <article class="bg-white rounded-xl border border-gray-100 shadow-sm p-8">
+    <article class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {news.thumbnail && (
+        <img
+          src={news.thumbnail.url + '?w=1200&h=500&fit=crop'}
+          alt={news.title}
+          class="w-full h-56 sm:h-72 object-cover"
+        />
+      )}
+      <div class="p-8">
       <div class="flex flex-wrap items-center gap-3 mb-4">
         <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
           {news.category}
@@ -62,6 +70,7 @@ const categoryColors: Record<string, string> = {
         class="prose prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline"
         set:html={news.body}
       />
+      </div>
     </article>
 
     <div class="mt-8 text-center">

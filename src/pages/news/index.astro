@@ -44,21 +44,32 @@ const categoryColors: Record<string, string> = {
 
     <div class="space-y-4">
       {newsList.map((news) => (
-        <a href={`/news/${news.id}`} class="card p-5 flex items-start gap-4 block hover:bg-gray-50">
-          <div class="flex-1 min-w-0">
-            <div class="flex flex-wrap items-center gap-2 mb-2">
-              <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
-                {news.category}
-              </span>
-              <time class="text-xs text-gray-400">{formatDate(news.publishedAt)}</time>
+        <a href={`/news/${news.id}`} class="card flex items-stretch block hover:bg-gray-50 overflow-hidden">
+          {news.thumbnail && (
+            <div class="w-32 sm:w-40 flex-shrink-0">
+              <img
+                src={news.thumbnail.url + '?w=320&h=200&fit=crop'}
+                alt={news.title}
+                class="w-full h-full object-cover"
+              />
             </div>
-            <h2 class="font-medium text-gray-900 hover:text-primary-600 transition-colors leading-snug">
-              {news.title}
-            </h2>
+          )}
+          <div class="flex-1 min-w-0 p-5 flex items-start gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
+                  {news.category}
+                </span>
+                <time class="text-xs text-gray-400">{formatDate(news.publishedAt)}</time>
+              </div>
+              <h2 class="font-medium text-gray-900 hover:text-primary-600 transition-colors leading-snug">
+                {news.title}
+              </h2>
+            </div>
+            <svg class="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </div>
-          <svg class="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
         </a>
       ))}
     </div>
