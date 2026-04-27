@@ -1,0 +1,166 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/microcms';
+import type { News, Organization } from '../lib/microcms';
+
+// ダミーデータ（microCMS接続前の表示確認用）
+const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
+
+let latestNews: News[] = [];
+let featuredOrgs: Organization[] = [];
+
+if (!isDev) {
+  const [newsRes, orgsRes] = await Promise.all([
+    client.getList<News>({ endpoint: 'news', queries: { limit: 3, orders: '-publishedAt' } }),
+    client.getList<Organization>({ endpoint: 'organizations', queries: { limit: 6 } }),
+  ]);
+  latestNews = newsRes.contents;
+  featuredOrgs = orgsRes.contents;
+} else {
+  // 開発用ダミーデータ
+  latestNews = [
+    { id: '1', createdAt: '', updatedAt: '', publishedAt: '2026-04-01', title: '2026年度活動報告会のお知らせ', category: 'お知らせ', body: '' },
+    { id: '2', createdAt: '', updatedAt: '', publishedAt: '2026-03-15', title: '新規加盟団体のご紹介', category: 'トピックス', body: '' },
+    { id: '3', createdAt: '', updatedAt: '', publishedAt: '2026-03-01', title: '補助金申請セミナーを開催しました', category: 'イベント', body: '' },
+  ];
+  featuredOrgs = [
+    { id: '1', name: '熊本まちづくりの会', description: '地域の課題解決に取り組む団体です。', category: 'まちづくり', area: '熊本市' },
+    { id: '2', name: 'くまもと子ども食堂ネット', description: '子どもたちの食と居場所を支援しています。', category: '子ども支援', area: '県内全域' },
+    { id: '3', name: 'ひごの里山保全隊', description: '里山の環境保全活動を行っています。', category: '環境', area: '阿蘇・山鹿' },
+    { id: '4', name: '菊陽高齢者サポート', description: '高齢者の生活を地域で支えます。', category: '福祉', area: '菊陽町' },
+    { id: '5', name: '天草観光振興協議会', description: '天草の魅力を国内外に発信しています。', category: '観光振興', area: '天草市' },
+    { id: '6', name: 'くまもと防災ボランティア', description: '災害時の支援活動に備えています。', category: '防災', area: '県内全域' },
+  ];
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const categoryColors: Record<string, string> = {
+  'お知らせ': 'bg-blue-100 text-blue-700',
+  'トピックス': 'bg-green-100 text-green-700',
+  'イベント': 'bg-orange-100 text-orange-700',
+  'まちづくり': 'bg-emerald-100 text-emerald-700',
+  '子ども支援': 'bg-pink-100 text-pink-700',
+  '環境': 'bg-teal-100 text-teal-700',
+  '福祉': 'bg-purple-100 text-purple-700',
+  '観光振興': 'bg-amber-100 text-amber-700',
+  '防災': 'bg-red-100 text-red-700',
+};
+---
+
+<Layout title="トップ">
+  <!-- ヒーローセクション -->
+  <section class="bg-gradient-to-br from-gray-900 via-gray-800 to-primary-900 text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+      <div class="max-w-2xl">
+        <p class="text-primary-400 font-medium mb-4 text-sm tracking-wide uppercase">Hinokuni Mirai</p>
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
+          熊本の地域活動を、<br />
+          <span class="text-primary-400">つなぎ、ひろげる。</span>
+        </h1>
+        <p class="text-gray-300 text-lg leading-relaxed mb-8">
+          「ひのくに未来」は、熊本県内の地域団体・NPO・ボランティア活動を支援するポータルサイトです。
+          最新ニュース・団体情報・補助金情報をまとめてお届けします。
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="/organizations" class="btn-primary">団体を探す</a>
+          <a href="/subsidies" class="btn-outline border-white text-white hover:bg-white/10">補助金を探す</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 特徴3点 -->
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { icon: '📢', title: '最新ニュース', desc: '地域団体の活動報告・イベント情報・行政からのお知らせをまとめて掲載しています。' },
+          { icon: '🤝', title: '団体リスト', desc: '熊本県内で活動する団体を分野・地域で検索できます。仲間や連携先を見つけましょう。' },
+          { icon: '💰', title: '補助金・助成金', desc: '活動資金の調達に役立つ補助金・助成金情報を随時更新しています。' },
+        ].map((item) => (
+          <div class="text-center p-6">
+            <div class="text-4xl mb-4">{item.icon}</div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 最新ニュース -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <h2 class="section-title">最新ニュース</h2>
+          <p class="section-subtitle">地域の最新情報をお届けします</p>
+        </div>
+        <a href="/news" class="text-primary-600 text-sm font-medium hover:underline">すべて見る →</a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {latestNews.map((news) => (
+          <a href={`/news/${news.id}`} class="card p-5 block">
+            <div class="flex items-center gap-2 mb-3">
+              <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
+                {news.category}
+              </span>
+              <time class="text-xs text-gray-400">{formatDate(news.publishedAt)}</time>
+            </div>
+            <h3 class="font-medium text-gray-900 leading-snug hover:text-primary-600 transition-colors">
+              {news.title}
+            </h3>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 団体リスト -->
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <h2 class="section-title">掲載団体</h2>
+          <p class="section-subtitle">熊本で活動する団体をご紹介します</p>
+        </div>
+        <a href="/organizations" class="text-primary-600 text-sm font-medium hover:underline">すべて見る →</a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {featuredOrgs.map((org) => (
+          <div class="card p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class:list={['badge', categoryColors[org.category] ?? 'bg-gray-100 text-gray-600']}>
+                {org.category}
+              </span>
+              <span class="text-xs text-gray-400">{org.area}</span>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-1">{org.name}</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">{org.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 bg-primary-600">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+        掲載・情報提供のご依頼
+      </h2>
+      <p class="text-primary-100 mb-8">
+        団体情報・補助金情報の掲載依頼、活動報告のご連絡はお気軽にどうぞ。
+      </p>
+      <a href="/contact" class="inline-flex items-center justify-center px-8 py-3 bg-white text-primary-600 font-bold rounded-lg hover:bg-primary-50 transition-colors">
+        お問い合わせはこちら
+      </a>
+    </div>
+  </section>
+</Layout>

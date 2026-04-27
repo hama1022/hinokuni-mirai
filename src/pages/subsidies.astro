@@ -1,0 +1,136 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/microcms';
+import type { Subsidy } from '../lib/microcms';
+
+const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
+
+let subsidies: Subsidy[] = [];
+
+if (!isDev) {
+  const res = await client.getList<Subsidy>({
+    endpoint: 'subsidies',
+    queries: { limit: 100 },
+  });
+  subsidies = res.contents;
+} else {
+  subsidies = [
+    {
+      id: '1', title: '令和7年度 地域活動支援補助金',
+      summary: '地域の課題解決に向けた市民活動・NPO活動を支援します。',
+      target: 'NPO法人・任意団体', amount: '上限50万円',
+      deadline: '2026-05-31', category: '市民活動',
+      url: 'https://example.com',
+    },
+    {
+      id: '2', title: '子ども・若者支援活動助成金',
+      summary: '子どもや若者の健全育成・居場所づくりに取り組む団体を支援します。',
+      target: 'NPO法人・ボランティア団体', amount: '上限100万円',
+      deadline: '2026-06-15', category: '子ども支援',
+    },
+    {
+      id: '3', title: '環境保全活動推進費補助金',
+      summary: '地域の環境保全・生物多様性の保護に係る活動を支援します。',
+      target: '地域団体・NPO', amount: '上限30万円',
+      deadline: '2026-04-30', category: '環境',
+    },
+    {
+      id: '4', title: 'くまもと地域共生社会推進助成',
+      summary: '高齢者・障がい者・外国人など多様な人が共に暮らせる地域づくりを支援します。',
+      target: 'NPO法人・社会福祉法人', amount: '上限200万円',
+      deadline: '2026-07-31', category: '福祉・共生',
+    },
+    {
+      id: '5', title: '農山漁村活性化プロジェクト支援交付金',
+      summary: '農山漁村の活性化・移住定住促進に向けた取り組みを支援します。',
+      target: '地方公共団体・農業者団体', amount: '定額補助',
+      deadline: '2026-05-10', category: '農業・地域振興',
+    },
+  ];
+}
+
+function formatDeadline(dateStr?: string) {
+  if (!dateStr) return '随時';
+  const d = new Date(dateStr);
+  const today = new Date();
+  const diff = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const label = d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+  if (diff < 0) return `締切済み (${label})`;
+  if (diff <= 14) return `⚠️ 締切間近 ${label} (残り${diff}日)`;
+  return label;
+}
+
+function isExpired(dateStr?: string) {
+  if (!dateStr) return false;
+  return new Date(dateStr) < new Date();
+}
+
+const categoryColors: Record<string, string> = {
+  '市民活動': 'bg-blue-100 text-blue-700',
+  '子ども支援': 'bg-pink-100 text-pink-700',
+  '環境': 'bg-teal-100 text-teal-700',
+  '福祉・共生': 'bg-purple-100 text-purple-700',
+  '農業・地域振興': 'bg-amber-100 text-amber-700',
+};
+---
+
+<Layout title="補助金・助成金情報" description="熊本の地域活動に役立つ補助金・助成金情報">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+      <h1 class="section-title">補助金・助成金情報</h1>
+      <p class="section-subtitle">地域活動の資金調達に役立つ情報をまとめています</p>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 text-sm text-amber-800">
+      ※ 情報は随時更新していますが、最新の申請要件・締切日は必ず各公式サイトでご確認ください。
+    </div>
+
+    <div class="space-y-5">
+      {subsidies.map((sub) => (
+        <div class:list={['card p-6', isExpired(sub.deadline) ? 'opacity-60' : '']}>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class:list={['badge', categoryColors[sub.category] ?? 'bg-gray-100 text-gray-600']}>
+              {sub.category}
+            </span>
+            {isExpired(sub.deadline) && (
+              <span class="badge bg-gray-100 text-gray-500">締切済み</span>
+            )}
+          </div>
+
+          <h2 class="font-bold text-gray-900 text-lg mb-2">{sub.title}</h2>
+          <p class="text-gray-600 text-sm leading-relaxed mb-4">{sub.summary}</p>
+
+          <dl class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-50 rounded-lg p-3">
+              <dt class="text-xs text-gray-400 mb-1">対象</dt>
+              <dd class="font-medium text-gray-700">{sub.target}</dd>
+            </div>
+            {sub.amount && (
+              <div class="bg-gray-50 rounded-lg p-3">
+                <dt class="text-xs text-gray-400 mb-1">補助額</dt>
+                <dd class="font-medium text-gray-700">{sub.amount}</dd>
+              </div>
+            )}
+            <div class="bg-gray-50 rounded-lg p-3">
+              <dt class="text-xs text-gray-400 mb-1">申請締切</dt>
+              <dd class="font-medium text-gray-700">{formatDeadline(sub.deadline)}</dd>
+            </div>
+          </dl>
+
+          {sub.url && (
+            <div class="mt-4">
+              <a
+                href={sub.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-outline text-sm py-2"
+              >
+                詳細・申請はこちら →
+              </a>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</Layout>

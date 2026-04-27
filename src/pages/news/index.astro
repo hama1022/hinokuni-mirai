@@ -1,0 +1,66 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { client } from '../../lib/microcms';
+import type { News } from '../../lib/microcms';
+
+const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
+
+let newsList: News[] = [];
+
+if (!isDev) {
+  const res = await client.getList<News>({
+    endpoint: 'news',
+    queries: { limit: 20, orders: '-publishedAt' },
+  });
+  newsList = res.contents;
+} else {
+  newsList = [
+    { id: '1', createdAt: '', updatedAt: '', publishedAt: '2026-04-01', title: '2026年度活動報告会のお知らせ', category: 'お知らせ', body: '<p>詳細はこちら</p>' },
+    { id: '2', createdAt: '', updatedAt: '', publishedAt: '2026-03-15', title: '新規加盟団体のご紹介', category: 'トピックス', body: '<p>詳細はこちら</p>' },
+    { id: '3', createdAt: '', updatedAt: '', publishedAt: '2026-03-01', title: '補助金申請セミナーを開催しました', category: 'イベント', body: '<p>詳細はこちら</p>' },
+    { id: '4', createdAt: '', updatedAt: '', publishedAt: '2026-02-20', title: '令和7年度 環境保全活動助成金の受付開始', category: 'お知らせ', body: '<p>詳細はこちら</p>' },
+    { id: '5', createdAt: '', updatedAt: '', publishedAt: '2026-02-10', title: '熊本地域連携フォーラムを開催します', category: 'イベント', body: '<p>詳細はこちら</p>' },
+  ];
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const categoryColors: Record<string, string> = {
+  'お知らせ': 'bg-blue-100 text-blue-700',
+  'トピックス': 'bg-green-100 text-green-700',
+  'イベント': 'bg-orange-100 text-orange-700',
+};
+---
+
+<Layout title="ニュース" description="ひのくに未来の最新ニュース・イベント情報">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-10">
+      <h1 class="section-title">ニュース</h1>
+      <p class="section-subtitle">最新のお知らせ・イベント情報をお届けします</p>
+    </div>
+
+    <div class="space-y-4">
+      {newsList.map((news) => (
+        <a href={`/news/${news.id}`} class="card p-5 flex items-start gap-4 block hover:bg-gray-50">
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
+                {news.category}
+              </span>
+              <time class="text-xs text-gray-400">{formatDate(news.publishedAt)}</time>
+            </div>
+            <h2 class="font-medium text-gray-900 hover:text-primary-600 transition-colors leading-snug">
+              {news.title}
+            </h2>
+          </div>
+          <svg class="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

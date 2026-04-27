@@ -1,0 +1,71 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { client } from '../../lib/microcms';
+import type { News } from '../../lib/microcms';
+
+export async function getStaticPaths() {
+  const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
+
+  if (isDev) {
+    return [
+      { params: { id: '1' }, props: { news: { id: '1', createdAt: '', updatedAt: '', publishedAt: '2026-04-01', title: '2026年度活動報告会のお知らせ', category: 'お知らせ', body: '<p>2026年度の活動報告会を下記の通り開催いたします。</p><p>日時: 2026年5月15日（土）14:00〜16:00</p><p>場所: 熊本市民センター 大ホール</p><p>参加費: 無料</p><p>事前申込不要でご参加いただけます。皆様のご来場をお待ちしております。</p>' } as News } },
+      { params: { id: '2' }, props: { news: { id: '2', createdAt: '', updatedAt: '', publishedAt: '2026-03-15', title: '新規加盟団体のご紹介', category: 'トピックス', body: '<p>このたび、新たに5団体が「ひのくに未来」に加盟しました。</p>' } as News } },
+      { params: { id: '3' }, props: { news: { id: '3', createdAt: '', updatedAt: '', publishedAt: '2026-03-01', title: '補助金申請セミナーを開催しました', category: 'イベント', body: '<p>先日、補助金申請セミナーを開催し、約30名の方にご参加いただきました。</p>' } as News } },
+    ];
+  }
+
+  const res = await client.getList<News>({ endpoint: 'news', queries: { limit: 100 } });
+  return res.contents.map((news) => ({
+    params: { id: news.id },
+    props: { news },
+  }));
+}
+
+const { news } = Astro.props as { news: News };
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const categoryColors: Record<string, string> = {
+  'お知らせ': 'bg-blue-100 text-blue-700',
+  'トピックス': 'bg-green-100 text-green-700',
+  'イベント': 'bg-orange-100 text-orange-700',
+};
+---
+
+<Layout title={news.title} description={news.title}>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- パンくず -->
+    <nav class="text-sm text-gray-400 mb-8 flex items-center gap-2">
+      <a href="/" class="hover:text-gray-600">トップ</a>
+      <span>/</span>
+      <a href="/news" class="hover:text-gray-600">ニュース</a>
+      <span>/</span>
+      <span class="text-gray-600 truncate">{news.title}</span>
+    </nav>
+
+    <article class="bg-white rounded-xl border border-gray-100 shadow-sm p-8">
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
+          {news.category}
+        </span>
+        <time class="text-sm text-gray-400">{formatDate(news.publishedAt)}</time>
+      </div>
+
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-snug mb-8">
+        {news.title}
+      </h1>
+
+      <div
+        class="prose prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline"
+        set:html={news.body}
+      />
+    </article>
+
+    <div class="mt-8 text-center">
+      <a href="/news" class="btn-outline">← ニュース一覧に戻る</a>
+    </div>
+  </div>
+</Layout>

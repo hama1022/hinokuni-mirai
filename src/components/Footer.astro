@@ -1,0 +1,49 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-gray-900 text-gray-300 mt-20">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <!-- ブランド -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 bg-primary-600 rounded-md flex items-center justify-center">
+            <span class="text-white font-bold text-xs">火</span>
+          </div>
+          <span class="font-bold text-white text-base">ひのくに未来</span>
+        </div>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          熊本の地域団体・NPOを支援し、<br />地域の未来をつくるポータルサイトです。
+        </p>
+      </div>
+
+      <!-- リンク -->
+      <div>
+        <h3 class="text-white font-semibold mb-4 text-sm">サイトマップ</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/" class="hover:text-white transition-colors">トップ</a></li>
+          <li><a href="/news" class="hover:text-white transition-colors">ニュース</a></li>
+          <li><a href="/organizations" class="hover:text-white transition-colors">団体リスト</a></li>
+          <li><a href="/subsidies" class="hover:text-white transition-colors">補助金・助成金</a></li>
+          <li><a href="/contact" class="hover:text-white transition-colors">お問い合わせ</a></li>
+        </ul>
+      </div>
+
+      <!-- お問い合わせ -->
+      <div>
+        <h3 class="text-white font-semibold mb-4 text-sm">お問い合わせ</h3>
+        <p class="text-sm text-gray-400 mb-4">
+          掲載のご依頼・ご質問はお気軽にどうぞ。
+        </p>
+        <a href="/contact" class="btn-primary text-sm">
+          お問い合わせはこちら
+        </a>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-800 mt-10 pt-6 text-center text-xs text-gray-500">
+      &copy; {year} ひのくに未来. All rights reserved.
+    </div>
+  </div>
+</footer>
