@@ -53,8 +53,9 @@ const categoryColors: Record<string, string> = {
 
 <Layout title="トップ">
   <!-- ヒーローセクション -->
-  <section class="bg-gradient-to-br from-gray-900 via-gray-800 to-primary-900 text-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+  <section class="relative text-white" style="background-image: url('/hero.jpg'); background-size: cover; background-position: center;">
+    <div class="absolute inset-0 bg-black/55"></div>
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
       <div class="max-w-2xl">
         <p class="text-primary-400 font-medium mb-4 text-sm tracking-wide uppercase">Hinokuni Mirai</p>
         <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
