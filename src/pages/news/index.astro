@@ -45,10 +45,10 @@ const categoryColors: Record<string, string> = {
     <div class="space-y-4">
       {newsList.map((news) => (
         <a href={`/news/${news.id}`} class="card flex items-stretch block hover:bg-gray-50 overflow-hidden">
-          {news.thumbnail && (
+          {news.image && (
             <div class="w-32 sm:w-40 flex-shrink-0">
               <img
-                src={news.thumbnail.url + '?w=320&h=200&fit=crop'}
+                src={news.image.url + '?w=320&h=200&fit=crop'}
                 alt={news.title}
                 class="w-full h-full object-cover"
               />

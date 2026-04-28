@@ -47,9 +47,9 @@ const categoryColors: Record<string, string> = {
     </nav>
 
     <article class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      {news.thumbnail && (
+      {news.image && (
         <img
-          src={news.thumbnail.url + '?w=1200&h=500&fit=crop'}
+          src={news.image.url + '?w=1200&h=500&fit=crop'}
           alt={news.title}
           class="w-full h-56 sm:h-72 object-cover"
         />

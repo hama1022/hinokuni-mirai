@@ -14,7 +14,7 @@ export type News = {
   title: string;
   category: string;
   body: string;
-  thumbnail?: { url: string; width: number; height: number };
+  image?: { url: string; width: number; height: number };
 };
 
 export type Organization = {
