@@ -15,28 +15,31 @@ if (!isDev) {
   orgs = res.contents;
 } else {
   orgs = [
-    { id: '1', name: '熊本まちづくりの会', description: '地域の課題解決に取り組む市民団体です。年間を通じてワークショップや勉強会を開催しています。', category: 'まちづくり', area: '熊本市', url: 'https://example.com' },
-    { id: '2', name: 'くまもと子ども食堂ネット', description: '子どもたちの食と居場所を支援するネットワークです。県内20か所以上の子ども食堂と連携しています。', category: '子ども支援', area: '県内全域' },
-    { id: '3', name: 'ひごの里山保全隊', description: '里山の環境保全活動を行っています。竹林整備・農地保全・生物多様性の保護に取り組んでいます。', category: '環境', area: '阿蘇・山鹿' },
-    { id: '4', name: '菊陽高齢者サポート', description: '高齢者の生活を地域で支えます。見守り・配食・移動支援などのサービスを提供しています。', category: '福祉', area: '菊陽町' },
-    { id: '5', name: '天草観光振興協議会', description: '天草の魅力を国内外に発信しています。体験型観光の開発・インバウンド対応に注力しています。', category: '観光振興', area: '天草市' },
-    { id: '6', name: 'くまもと防災ボランティア', description: '災害時の支援活動に備えています。定期的な訓練と地域コミュニティとの連携を大切にしています。', category: '防災', area: '県内全域' },
-    { id: '7', name: '熊本外国人支援センター', description: '在住外国人の生活相談・日本語教育・多文化共生の推進に取り組んでいます。', category: '多文化共生', area: '熊本市' },
-    { id: '8', name: '球磨川流域自然再生協議会', description: '球磨川流域の自然環境再生と持続可能な地域づくりを推進しています。', category: '環境', area: '人吉・球磨' },
+    { id: '1', name: '熊本まちづくりの会', description: '地域の課題解決に取り組む市民団体です。年間を通じてワークショップや勉強会を開催しています。', category: ['観光交流', '文化'], area: '熊本市', url: 'https://example.com' },
+    { id: '2', name: 'くまもと子ども食堂ネット', description: '子どもたちの食と居場所を支援するネットワークです。県内20か所以上の子ども食堂と連携しています。', category: ['福祉健康', '教育'], area: '県内全域' },
+    { id: '3', name: 'ひごの里山保全隊', description: '里山の環境保全活動を行っています。竹林整備・農地保全・生物多様性の保護に取り組んでいます。', category: ['環境', '農林業'], area: '阿蘇・山鹿' },
+    { id: '4', name: '菊陽高齢者サポート', description: '高齢者の生活を地域で支えます。見守り・配食・移動支援などのサービスを提供しています。', category: ['福祉健康'], area: '菊陽町' },
+    { id: '5', name: '天草観光振興協議会', description: '天草の魅力を国内外に発信しています。体験型観光の開発・インバウンド対応に注力しています。', category: ['観光交流'], area: '天草市' },
+    { id: '6', name: 'くまもと防災ボランティア', description: '災害時の支援活動に備えています。定期的な訓練と地域コミュニティとの連携を大切にしています。', category: ['防災'], area: '県内全域' },
+    { id: '7', name: '熊本外国人支援センター', description: '在住外国人の生活相談・日本語教育・多文化共生の推進に取り組んでいます。', category: ['文化', '移住'], area: '熊本市' },
+    { id: '8', name: '球磨川流域自然再生協議会', description: '球磨川流域の自然環境再生と持続可能な地域づくりを推進しています。', category: ['環境'], area: '人吉・球磨' },
   ];
 }
 
-// カテゴリ一覧（重複除去）
-const categories = ['すべて', ...new Set(orgs.map((o) => o.category))];
+// カテゴリ一覧（重複除去・配列をフラット化）
+const categories = ['すべて', ...new Set(orgs.flatMap((o) => o.category ?? []))];
 
 const categoryColors: Record<string, string> = {
-  'まちづくり': 'bg-emerald-100 text-emerald-700',
-  '子ども支援': 'bg-pink-100 text-pink-700',
+  '観光交流': 'bg-amber-100 text-amber-700',
+  '産業': 'bg-blue-100 text-blue-700',
+  '農林業': 'bg-green-100 text-green-700',
   '環境': 'bg-teal-100 text-teal-700',
-  '福祉': 'bg-purple-100 text-purple-700',
-  '観光振興': 'bg-amber-100 text-amber-700',
+  '福祉健康': 'bg-purple-100 text-purple-700',
+  '教育': 'bg-indigo-100 text-indigo-700',
+  '文化': 'bg-pink-100 text-pink-700',
+  '移住': 'bg-emerald-100 text-emerald-700',
   '防災': 'bg-red-100 text-red-700',
-  '多文化共生': 'bg-indigo-100 text-indigo-700',
+  '情報発信': 'bg-cyan-100 text-cyan-700',
 };
 ---
 
@@ -67,11 +70,13 @@ const categoryColors: Record<string, string> = {
     <!-- 団体カード一覧 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="org-list">
       {orgs.map((org) => (
-        <div class="card p-6 org-card" data-category={org.category}>
-          <div class="flex items-center gap-2 mb-3">
-            <span class:list={['badge', categoryColors[org.category] ?? 'bg-gray-100 text-gray-600']}>
-              {org.category}
-            </span>
+        <div class="card p-6 org-card" data-category={(org.category ?? []).join(',')}>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            {(org.category ?? []).map((cat) => (
+              <span class:list={['badge', categoryColors[cat] ?? 'bg-gray-100 text-gray-600']}>
+                {cat}
+              </span>
+            ))}
             <span class="text-xs text-gray-400">{org.area}</span>
           </div>
           <h2 class="font-bold text-gray-900 text-lg mb-2">{org.name}</h2>
@@ -113,7 +118,8 @@ const categoryColors: Record<string, string> = {
 
       // カード表示切り替え
       cards.forEach((card) => {
-        if (selected === 'すべて' || card.dataset.category === selected) {
+        const cardCategories = (card.dataset.category ?? '').split(',');
+        if (selected === 'すべて' || cardCategories.includes(selected)) {
           card.style.display = '';
         } else {
           card.style.display = 'none';

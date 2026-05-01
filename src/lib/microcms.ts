@@ -21,7 +21,7 @@ export type Organization = {
   id: string;
   name: string;
   description: string;
-  category: string;
+  category: string[];
   area: string;
   url?: string;
   logo?: { url: string; width: number; height: number };
