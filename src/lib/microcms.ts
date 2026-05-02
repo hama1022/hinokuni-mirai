@@ -24,6 +24,7 @@ export type Organization = {
   category: string[];
   area: string;
   url?: string;
+  photo?: { url: string; width: number; height: number };
   logo?: { url: string; width: number; height: number };
 };
 
