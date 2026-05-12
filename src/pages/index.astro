@@ -79,15 +79,15 @@ const categoryColors: Record<string, string> = {
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
-          { icon: '📢', title: '最新ニュース', desc: '地域団体の活動報告・イベント情報・行政からのお知らせをまとめて掲載しています。' },
-          { icon: '🤝', title: '団体リスト', desc: '熊本県内で活動する団体を分野・地域で検索できます。仲間や連携先を見つけましょう。' },
-          { icon: '💰', title: '補助金・助成金', desc: '活動資金の調達に役立つ補助金・助成金情報を随時更新しています。' },
+          { icon: '📢', title: '最新ニュース', desc: '地域団体の活動報告・イベント情報・行政からのお知らせをまとめて掲載しています。', href: '/news' },
+          { icon: '🤝', title: '団体リスト', desc: '熊本県内で活動する団体を分野・地域で検索できます。仲間や連携先を見つけましょう。', href: '/organizations' },
+          { icon: '💰', title: '補助金・助成金', desc: '活動資金の調達に役立つ補助金・助成金情報を随時更新しています。', href: '/subsidies' },
         ].map((item) => (
-          <div class="text-center p-6">
+          <a href={item.href} class="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors group block">
             <div class="text-4xl mb-4">{item.icon}</div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">{item.title}</h3>
             <p class="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-          </div>
+          </a>
         ))}
       </div>
     </div>
