@@ -53,7 +53,21 @@ const categoryColors: Record<string, string> = {
 
 <Layout title="トップ">
   <!-- ヒーローセクション -->
-  <section class="relative text-white" style="background-image: url('/hero.jpg'); background-size: cover; background-position: center;">
+  <section class="relative text-white overflow-hidden" id="hero-section" style="min-height: 480px;">
+    <!-- スライドショー背景 -->
+    <div id="hero-slides" class="absolute inset-0">
+      {[
+        '/hero/01.jpg', '/hero/02.jpg', '/hero/03.jpg',
+        '/hero/04.jpg', '/hero/05.jpg', '/hero/06.jpg',
+        '/hero/07.jpg', '/hero/08.jpg', '/hero/09.jpg',
+      ].map((src, i) => (
+        <div
+          class="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+          style={`background-image: url('${src}'); opacity: ${i === 0 ? 1 : 0};`}
+          data-slide={i}
+        />
+      ))}
+    </div>
     <div class="absolute inset-0 bg-black/55"></div>
     <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
       <div class="max-w-2xl">
@@ -73,6 +87,16 @@ const categoryColors: Record<string, string> = {
       </div>
     </div>
   </section>
+
+  <script>
+    const slides = document.querySelectorAll<HTMLElement>('#hero-slides [data-slide]');
+    let current = 0;
+    setInterval(() => {
+      slides[current].style.opacity = '0';
+      current = (current + 1) % slides.length;
+      slides[current].style.opacity = '1';
+    }, 6000);
+  </script>
 
   <!-- 特徴3点 -->
   <section class="py-16 bg-white">
