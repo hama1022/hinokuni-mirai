@@ -26,8 +26,18 @@ if (!isDev) {
   ];
 }
 
+// エリア文字列を正規化（文字列・配列どちらでも対応）
+function normalizeArea(area: string | string[] | undefined): string {
+  if (!area) return '';
+  if (Array.isArray(area)) return area.join('・');
+  return area;
+}
+
 // カテゴリ一覧（重複除去・配列をフラット化）
 const categories = ['すべて', ...new Set(orgs.flatMap((o) => o.category ?? []))];
+
+// 地域一覧（重複除去）
+const areas = ['すべて', ...new Set(orgs.map((o) => normalizeArea(o.area)).filter(Boolean))];
 
 const categoryColors: Record<string, string> = {
   '観光交流': 'bg-amber-100 text-amber-700',
@@ -51,27 +61,52 @@ const categoryColors: Record<string, string> = {
       <p class="section-subtitle">熊本県内で活動する団体をご紹介します</p>
     </div>
 
-    <!-- カテゴリフィルター -->
-    <div class="flex flex-wrap gap-2 mb-8" id="filter-btns">
-      {categories.map((cat) => (
-        <button
-          data-category={cat}
-          class:list={[
-            'px-4 py-2 rounded-full text-sm font-medium border transition-colors filter-btn',
-            cat === 'すべて'
-              ? 'bg-gray-900 text-white border-gray-900'
-              : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500',
-          ]}
-        >
-          {cat}
-        </button>
-      ))}
+    <!-- フィルター -->
+    <div class="mb-8 space-y-3">
+      <!-- ジャンルフィルター -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide w-12 shrink-0">ジャンル</span>
+        <div class="flex flex-wrap gap-2" id="cat-btns">
+          {categories.map((cat) => (
+            <button
+              data-category={cat}
+              class:list={[
+                'px-4 py-1.5 rounded-full text-sm font-medium border transition-colors cat-btn',
+                cat === 'すべて'
+                  ? 'bg-gray-900 text-white border-gray-900'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500',
+              ]}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+      <!-- 地域フィルター -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide w-12 shrink-0">地域</span>
+        <div class="flex flex-wrap gap-2" id="area-btns">
+          {areas.map((area) => (
+            <button
+              data-area={area}
+              class:list={[
+                'px-4 py-1.5 rounded-full text-sm font-medium border transition-colors area-btn',
+                area === 'すべて'
+                  ? 'bg-primary-600 text-white border-primary-600'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-primary-400',
+              ]}
+            >
+              {area}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
 
     <!-- 団体カード一覧 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="org-list">
       {orgs.map((org) => (
-        <div class="card overflow-hidden org-card" data-category={(org.category ?? []).join(',')}>
+        <div class="card overflow-hidden org-card" data-category={(org.category ?? []).join(',')} data-area={normalizeArea(org.area)}>
           <!-- 写真（16:9） -->
           <div class="relative w-full aspect-video bg-gray-100 overflow-hidden">
             <img
@@ -116,30 +151,46 @@ const categoryColors: Record<string, string> = {
 </Layout>
 
 <script>
-  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const catBtns = document.querySelectorAll<HTMLButtonElement>('.cat-btn');
+  const areaBtns = document.querySelectorAll<HTMLButtonElement>('.area-btn');
   const cards = document.querySelectorAll<HTMLElement>('.org-card');
 
-  filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const selected = btn.dataset.category ?? 'すべて';
+  let selectedCat = 'すべて';
+  let selectedArea = 'すべて';
 
-      // ボタンのスタイル切り替え
-      filterBtns.forEach((b) => {
+  function applyFilters() {
+    cards.forEach((card) => {
+      const cardCategories = (card.dataset.category ?? '').split(',');
+      const cardArea = card.dataset.area ?? '';
+      const catOk = selectedCat === 'すべて' || cardCategories.includes(selectedCat);
+      const areaOk = selectedArea === 'すべて' || cardArea === selectedArea;
+      card.style.display = catOk && areaOk ? '' : 'none';
+    });
+  }
+
+  catBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      selectedCat = btn.dataset.category ?? 'すべて';
+      catBtns.forEach((b) => {
         b.classList.remove('bg-gray-900', 'text-white', 'border-gray-900');
         b.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
       });
       btn.classList.add('bg-gray-900', 'text-white', 'border-gray-900');
       btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
+      applyFilters();
+    });
+  });
 
-      // カード表示切り替え
-      cards.forEach((card) => {
-        const cardCategories = (card.dataset.category ?? '').split(',');
-        if (selected === 'すべて' || cardCategories.includes(selected)) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
+  areaBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      selectedArea = btn.dataset.area ?? 'すべて';
+      areaBtns.forEach((b) => {
+        b.classList.remove('bg-primary-600', 'text-white', 'border-primary-600');
+        b.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
       });
+      btn.classList.add('bg-primary-600', 'text-white', 'border-primary-600');
+      btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
+      applyFilters();
     });
   });
 </script>
