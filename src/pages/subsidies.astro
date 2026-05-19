@@ -68,10 +68,22 @@ function isExpired(dateStr?: string) {
 const categoryColors: Record<string, string> = {
   '市民活動': 'bg-blue-100 text-blue-700',
   '子ども支援': 'bg-pink-100 text-pink-700',
+  '子ども・青少年': 'bg-pink-100 text-pink-700',
   '環境': 'bg-teal-100 text-teal-700',
   '福祉・共生': 'bg-purple-100 text-purple-700',
   '農業・地域振興': 'bg-amber-100 text-amber-700',
+  '農業・産業': 'bg-amber-100 text-amber-700',
+  '文化・国際交流': 'bg-indigo-100 text-indigo-700',
+  'コミュニティ活動': 'bg-emerald-100 text-emerald-700',
+  'まちづくり': 'bg-sky-100 text-sky-700',
+  '防災・安全': 'bg-red-100 text-red-700',
+  '移住・定住': 'bg-green-100 text-green-700',
+  '人材・起業': 'bg-orange-100 text-orange-700',
+  '多文化共生': 'bg-violet-100 text-violet-700',
 };
+
+// カテゴリ一覧（重複除去）
+const allCategories = ['すべて', ...new Set(subsidies.map((s) => s.category).filter(Boolean))];
 ---
 
 <Layout title="補助金・助成金情報" description="熊本の地域活動に役立つ補助金・助成金情報">
@@ -81,13 +93,49 @@ const categoryColors: Record<string, string> = {
       <p class="section-subtitle">地域活動の資金調達に役立つ情報をまとめています</p>
     </div>
 
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 text-sm text-amber-800">
+    <!-- PDFダウンロードバナー -->
+    <div class="bg-primary-50 border border-primary-200 rounded-xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div class="flex-1">
+        <p class="font-bold text-primary-800 mb-1">📄 令和7年度 地方創生財源ハンドブック</p>
+        <p class="text-sm text-primary-700">熊本県総務部が作成した補助金・交付金359事業を収録したハンドブック（PDF・8MB）。全情報を網羅的に確認できます。</p>
+      </div>
+      <a
+        href="/R7地方創生財源ハンドブック.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        PDFをダウンロード
+      </a>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm text-amber-800">
       ※ 情報は随時更新していますが、最新の申請要件・締切日は必ず各公式サイトでご確認ください。
     </div>
 
-    <div class="space-y-5">
+    <!-- カテゴリフィルター -->
+    <div class="mb-6 flex flex-wrap gap-2" id="cat-btns">
+      {allCategories.map((cat) => (
+        <button
+          data-category={cat}
+          class:list={[
+            'px-3 py-1.5 rounded-full text-sm font-medium border transition-colors sub-cat-btn',
+            cat === 'すべて'
+              ? 'bg-primary-600 text-white border-primary-600'
+              : 'bg-white text-gray-600 border-gray-300 hover:border-primary-400',
+          ]}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+
+    <div class="space-y-5" id="subsidy-list">
       {subsidies.map((sub) => (
-        <div class:list={['card p-6', isExpired(sub.deadline) ? 'opacity-60' : '']}>
+        <div class:list={['card p-6 subsidy-card', isExpired(sub.deadline) ? 'opacity-60' : '']} data-category={sub.category}>
           <div class="flex flex-wrap items-center gap-2 mb-3">
             <span class:list={['badge', categoryColors[sub.category] ?? 'bg-gray-100 text-gray-600']}>
               {sub.category}
@@ -111,10 +159,12 @@ const categoryColors: Record<string, string> = {
                 <dd class="font-medium text-gray-700">{sub.amount}</dd>
               </div>
             )}
-            <div class="bg-gray-50 rounded-lg p-3">
-              <dt class="text-xs text-gray-400 mb-1">申請締切</dt>
-              <dd class="font-medium text-gray-700">{formatDeadline(sub.deadline)}</dd>
-            </div>
+            {sub.deadline && (
+              <div class="bg-gray-50 rounded-lg p-3">
+                <dt class="text-xs text-gray-400 mb-1">申請締切</dt>
+                <dd class="font-medium text-gray-700">{formatDeadline(sub.deadline)}</dd>
+              </div>
+            )}
           </dl>
 
           {sub.url && (
@@ -134,3 +184,25 @@ const categoryColors: Record<string, string> = {
     </div>
   </div>
 </Layout>
+
+<script>
+  const catBtns = document.querySelectorAll<HTMLButtonElement>('.sub-cat-btn');
+  const cards = document.querySelectorAll<HTMLElement>('.subsidy-card');
+
+  catBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const selected = btn.dataset.category ?? 'すべて';
+      catBtns.forEach((b) => {
+        b.classList.remove('bg-primary-600', 'text-white', 'border-primary-600');
+        b.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
+      });
+      btn.classList.add('bg-primary-600', 'text-white', 'border-primary-600');
+      btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
+
+      cards.forEach((card) => {
+        const match = selected === 'すべて' || card.dataset.category === selected;
+        card.style.display = match ? '' : 'none';
+      });
+    });
+  });
+</script>
