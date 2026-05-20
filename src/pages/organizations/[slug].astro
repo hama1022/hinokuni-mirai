@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { client } from '../../lib/microcms';
-import type { Organization } from '../../lib/microcms';
+import type { Organization, OrgNews } from '../../lib/microcms';
 
 const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
 
@@ -25,6 +25,28 @@ export async function getStaticPaths() {
             contact: 'nankan@example.com',
             address: '熊本県玉名郡南関町',
           } as Organization,
+          devNews: [
+            {
+              id: 'news-1',
+              title: '南関町農業体験イベントを開催します',
+              body: '<p>今年も恒例の農業体験イベントを開催します。田植えや収穫体験など、自然とふれあう一日をお過ごしください。参加費無料、どなたでもご参加いただけます。</p>',
+              organization: 'nankan',
+              category: 'イベント',
+              publishedAt: '2025-05-01T00:00:00.000Z',
+              createdAt: '2025-05-01T00:00:00.000Z',
+              updatedAt: '2025-05-01T00:00:00.000Z',
+            },
+            {
+              id: 'news-2',
+              title: '移住相談会のご案内',
+              body: '<p>南関町への移住を検討されている方向けに、個別相談会を実施しています。住まい・仕事・子育て環境など、お気軽にご相談ください。</p>',
+              organization: 'nankan',
+              category: 'お知らせ',
+              publishedAt: '2025-04-15T00:00:00.000Z',
+              createdAt: '2025-04-15T00:00:00.000Z',
+              updatedAt: '2025-04-15T00:00:00.000Z',
+            },
+          ] as OrgNews[],
         },
       },
     ];
@@ -43,7 +65,27 @@ export async function getStaticPaths() {
     }));
 }
 
-const { org } = Astro.props as { org: Organization };
+const { org, devNews } = Astro.props as { org: Organization; devNews?: OrgNews[] };
+
+// ニュース取得（本番: microCMS / 開発: ダミーデータ）
+let orgNews: OrgNews[] = [];
+if (!isDev && org.subdomain) {
+  try {
+    const newsRes = await client.getList<OrgNews>({
+      endpoint: 'org-news',
+      queries: {
+        filters: `organization[equals]${org.subdomain}`,
+        orders: '-publishedAt',
+        limit: 20,
+      },
+    });
+    orgNews = newsRes.contents;
+  } catch {
+    // org-news エンドポイント未作成の場合は無視
+  }
+} else if (isDev && devNews) {
+  orgNews = devNews;
+}
 
 const categoryColors: Record<string, string> = {
   '観光交流': 'bg-amber-100 text-amber-700',
@@ -111,6 +153,33 @@ const photoUrl = org.photo
           <span class="text-2xl">🌱</span> 活動内容
         </h2>
         <p class="text-gray-700 leading-relaxed">{org.activities}</p>
+      </section>
+    )}
+
+    <!-- ニュース・お知らせ -->
+    {orgNews.length > 0 && (
+      <section class="card p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <span class="text-2xl">📢</span> ニュース・お知らせ
+        </h2>
+        <div class="space-y-6">
+          {orgNews.map((article) => (
+            <article class="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                {article.category && (
+                  <span class="inline-block text-xs font-medium bg-primary-50 text-primary-700 px-2.5 py-1 rounded-full">
+                    {article.category}
+                  </span>
+                )}
+                <time class="text-xs text-gray-400">
+                  {new Date(article.publishedAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </time>
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2">{article.title}</h3>
+              <div class="text-sm text-gray-600 leading-relaxed [&_p]:mb-2 [&_a]:text-primary-600 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5" set:html={article.body} />
+            </article>
+          ))}
+        </div>
       </section>
     )}
 

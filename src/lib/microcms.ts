@@ -33,6 +33,17 @@ export type Organization = {
   address?: string;
 };
 
+export type OrgNews = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  title: string;
+  body: string; // リッチエディタ → HTML文字列
+  organization: string; // 団体のsubdomain slug
+  category?: string; // お知らせ / イベント / 活動報告 など
+};
+
 export type Subsidy = {
   id: string;
   title: string;
