@@ -5,6 +5,9 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --site-version: 1;
+  }
   html {
     scroll-behavior: smooth;
   }
