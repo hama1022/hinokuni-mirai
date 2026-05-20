@@ -1,0 +1,174 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { client } from '../../lib/microcms';
+import type { Organization } from '../../lib/microcms';
+
+const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
+
+export async function getStaticPaths() {
+  const isDev = import.meta.env.DEV && !import.meta.env.MICROCMS_API_KEY;
+
+  if (isDev) {
+    return [
+      {
+        params: { slug: 'nankan' },
+        props: {
+          org: {
+            id: 'nankan',
+            name: 'なんかん響働隊',
+            subdomain: 'nankan',
+            description: '南関町を拠点に、地域の魅力を活かしたまちづくり活動を行っています。',
+            longDescription: '南関町の豊かな自然・歴史・文化を活かし、住民が主体となって地域課題の解決に取り組む団体です。農業体験、古民家再生、移住者支援など、幅広い活動を通じて「人がつながるまち南関」を目指しています。',
+            activities: '農業体験イベント・古民家再生プロジェクト・移住相談・地域交流イベント',
+            category: ['まちづくり', '農業・地域振興'],
+            area: '南関町',
+            contact: 'nankan@example.com',
+            address: '熊本県玉名郡南関町',
+          } as Organization,
+        },
+      },
+    ];
+  }
+
+  const res = await client.getList<Organization>({
+    endpoint: 'organizations',
+    queries: { limit: 100 },
+  });
+
+  return res.contents
+    .filter((org) => org.subdomain)
+    .map((org) => ({
+      params: { slug: org.subdomain! },
+      props: { org },
+    }));
+}
+
+const { org } = Astro.props as { org: Organization };
+
+const categoryColors: Record<string, string> = {
+  '観光交流': 'bg-amber-100 text-amber-700',
+  '産業': 'bg-blue-100 text-blue-700',
+  '農林業': 'bg-green-100 text-green-700',
+  '環境': 'bg-teal-100 text-teal-700',
+  '福祉健康': 'bg-purple-100 text-purple-700',
+  '教育': 'bg-indigo-100 text-indigo-700',
+  '文化': 'bg-pink-100 text-pink-700',
+  '移住': 'bg-emerald-100 text-emerald-700',
+  '防災': 'bg-red-100 text-red-700',
+  '情報発信': 'bg-cyan-100 text-cyan-700',
+  'まちづくり': 'bg-sky-100 text-sky-700',
+  '農業・地域振興': 'bg-amber-100 text-amber-700',
+  'その他': 'bg-gray-100 text-gray-600',
+};
+
+const photoUrl = org.photo
+  ? org.photo.url + '?w=1280&h=480&fit=crop'
+  : null;
+---
+
+<Layout title={`${org.name} | 火の国未来創造ネット`} description={org.description}>
+  <!-- ヒーロー -->
+  <section class="relative text-white overflow-hidden" style="min-height: 320px;">
+    {photoUrl ? (
+      <div
+        class="absolute inset-0 bg-cover bg-center"
+        style={`background-image: url('${photoUrl}');`}
+      />
+    ) : (
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />
+    )}
+    <div class="absolute inset-0 bg-black/50" />
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <div class="flex flex-wrap gap-2 mb-4">
+        {(org.category ?? []).map((cat) => (
+          <span class:list={['badge text-sm', categoryColors[cat] ?? 'bg-gray-100 text-gray-600']}>
+            {cat}
+          </span>
+        ))}
+      </div>
+      <h1 class="text-3xl md:text-5xl font-bold mb-3">{org.name}</h1>
+      <p class="text-gray-200 text-lg">{org.area}</p>
+    </div>
+  </section>
+
+  <!-- 本文 -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+
+    <!-- 団体紹介 -->
+    <section class="card p-8">
+      <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="text-2xl">🏢</span> 団体について
+      </h2>
+      <p class="text-gray-700 leading-relaxed text-base">
+        {org.longDescription || org.description}
+      </p>
+    </section>
+
+    <!-- 活動内容 -->
+    {org.activities && (
+      <section class="card p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span class="text-2xl">🌱</span> 活動内容
+        </h2>
+        <p class="text-gray-700 leading-relaxed">{org.activities}</p>
+      </section>
+    )}
+
+    <!-- 基本情報 -->
+    <section class="card p-8">
+      <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-2xl">📋</span> 基本情報
+      </h2>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <dt class="text-xs text-gray-400 mb-1">活動地域</dt>
+          <dd class="font-medium text-gray-700">{org.area}</dd>
+        </div>
+        {org.address && (
+          <div class="bg-gray-50 rounded-lg p-4">
+            <dt class="text-xs text-gray-400 mb-1">所在地</dt>
+            <dd class="font-medium text-gray-700">{org.address}</dd>
+          </div>
+        )}
+        {org.contact && (
+          <div class="bg-gray-50 rounded-lg p-4">
+            <dt class="text-xs text-gray-400 mb-1">連絡先</dt>
+            <dd class="font-medium text-gray-700">{org.contact}</dd>
+          </div>
+        )}
+        <div class="bg-gray-50 rounded-lg p-4">
+          <dt class="text-xs text-gray-400 mb-1">分野</dt>
+          <dd class="font-medium text-gray-700">{(org.category ?? []).join('・')}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- リンク・お問い合わせ -->
+    <section class="flex flex-wrap gap-4">
+      {org.url && (
+        <a
+          href={org.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-primary inline-flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Webサイトを見る
+        </a>
+      )}
+      <a href="/organizations" class="btn-outline inline-flex items-center gap-2">
+        ← 団体一覧に戻る
+      </a>
+    </section>
+
+    <!-- フッター帰属 -->
+    <div class="border-t pt-6 text-center text-sm text-gray-400">
+      このページは
+      <a href="/" class="text-primary-600 hover:underline">火の国未来創造ネット</a>
+      が提供する団体紹介ページです。
+    </div>
+  </div>
+</Layout>

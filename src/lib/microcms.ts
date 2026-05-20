@@ -26,6 +26,11 @@ export type Organization = {
   url?: string;
   photo?: { url: string; width: number; height: number };
   logo?: { url: string; width: number; height: number };
+  subdomain?: string;
+  longDescription?: string;
+  activities?: string;
+  contact?: string;
+  address?: string;
 };
 
 export type Subsidy = {
