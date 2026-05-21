@@ -28,6 +28,51 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+// HTMLからプレーンテキストを抽出してdescriptionに使う
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+const bodyText = stripHtml(news.body ?? '');
+const description = bodyText.length > 120 ? bodyText.slice(0, 117) + '...' : bodyText || news.title;
+
+const ogImage = news.image ? news.image.url + '?w=1200&h=630&fit=crop' : undefined;
+
+const siteUrl = 'https://hinokunimirai.com';
+
+// JSON-LD: NewsArticle
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: news.title,
+  description,
+  url: `${siteUrl}/news/${news.id}`,
+  ...(news.image && { image: news.image.url }),
+  datePublished: news.publishedAt,
+  dateModified: news.updatedAt || news.publishedAt,
+  publisher: {
+    '@type': 'Organization',
+    name: '火の国未来創造ネット',
+    url: siteUrl,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${siteUrl}/favicon-512x512.png`,
+    },
+  },
+  inLanguage: 'ja',
+};
+
+// JSON-LD: BreadcrumbList
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'トップ', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'ニュース', item: `${siteUrl}/news` },
+    { '@type': 'ListItem', position: 3, name: news.title, item: `${siteUrl}/news/${news.id}` },
+  ],
+};
+
 const categoryColors: Record<string, string> = {
   'お知らせ': 'bg-blue-100 text-blue-700',
   'トピックス': 'bg-green-100 text-green-700',
@@ -35,10 +80,21 @@ const categoryColors: Record<string, string> = {
 };
 ---
 
-<Layout title={news.title} description={news.title}>
+<Layout
+  title={news.title}
+  description={description}
+  ogType="article"
+  ogImage={ogImage}
+  publishedAt={news.publishedAt}
+  updatedAt={news.updatedAt}
+>
+  <!-- JSON-LD -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
+
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- パンくず -->
-    <nav class="text-sm text-gray-400 mb-8 flex items-center gap-2">
+    <nav aria-label="パンくずリスト" class="text-sm text-gray-400 mb-8 flex items-center gap-2">
       <a href="/" class="hover:text-gray-600">トップ</a>
       <span>/</span>
       <a href="/news" class="hover:text-gray-600">ニュース</a>
@@ -51,6 +107,8 @@ const categoryColors: Record<string, string> = {
         <img
           src={news.image.url + '?w=1200&h=500&fit=crop'}
           alt={news.title}
+          width="1200"
+          height="500"
           class="w-full h-56 sm:h-72 object-cover"
         />
       )}
@@ -59,7 +117,7 @@ const categoryColors: Record<string, string> = {
         <span class:list={['badge', categoryColors[news.category] ?? 'bg-gray-100 text-gray-600']}>
           {news.category}
         </span>
-        <time class="text-sm text-gray-400">{formatDate(news.publishedAt)}</time>
+        <time datetime={news.publishedAt} class="text-sm text-gray-400">{formatDate(news.publishedAt)}</time>
       </div>
 
       <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-snug mb-8">

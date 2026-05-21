@@ -107,9 +107,47 @@ const categoryColors: Record<string, string> = {
 const photoUrl = org.photo
   ? org.photo.url + '?w=1280&h=480&fit=crop'
   : null;
+
+const ogImage = org.photo
+  ? org.photo.url + '?w=1200&h=630&fit=crop'
+  : undefined;
+
+// area は string | string[] で来ることがあるので正規化
+const areaStr = Array.isArray(org.area) ? (org.area as string[]).join('・') : (org.area ?? '');
+const pageDescription = org.description || org.longDescription || `${org.name}（${areaStr}）の団体ページです。`;
+
+const siteUrl = 'https://hinokunimirai.com';
+const pageUrl = `${siteUrl}/organizations/${org.subdomain}`;
+
+// JSON-LD: LocalBusiness / NGO
+const orgDesc = org.longDescription || org.description || pageDescription;
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NGO',
+  name: org.name,
+  ...(orgDesc && { description: orgDesc }),
+  url: pageUrl,
+  ...(org.photo && { image: org.photo.url }),
+  ...(org.address && { address: { '@type': 'PostalAddress', addressLocality: org.address, addressCountry: 'JP' } }),
+  ...(org.url && { sameAs: [org.url] }),
+  ...(areaStr && { areaServed: areaStr }),
+};
+
+// JSON-LD: BreadcrumbList
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'トップ', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: '団体リスト', item: `${siteUrl}/organizations` },
+    { '@type': 'ListItem', position: 3, name: org.name, item: pageUrl },
+  ],
+};
 ---
 
-<Layout title={`${org.name} | 火の国未来創造ネット`} description={org.description}>
+<Layout title={org.name} description={pageDescription} ogImage={ogImage}>
+  <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
   <!-- ヒーロー -->
   <section class="relative text-white overflow-hidden" style="min-height: 320px;">
     {photoUrl ? (
