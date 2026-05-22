@@ -27,7 +27,7 @@ jobs:
           FORMSPREE_ID: ${{ secrets.FORMSPREE_ID }}
 
       - name: Deploy
-        run: npx wrangler pages deploy dist --project-name hinokuni-mirai --branch main --commit-dirty=true
+        run: npx wrangler pages deploy dist --project-name hinokuni-mirai --branch main --commit-dirty=true --commit-message="deploy via GitHub Actions"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ddafc5f311377ba5eea386f41cd9ae8d
