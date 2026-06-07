@@ -131,8 +131,32 @@ const categoryColors: Record<string, string> = {
       </div>
     </article>
 
-    <div class="mt-8 text-center">
+    <div class="mt-8 flex flex-wrap gap-4 justify-center">
       <a href="/news" class="btn-outline">← ニュース一覧に戻る</a>
+    </div>
+
+    <!-- クロスリンク -->
+    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="/organizations" class="card p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <span class="text-3xl">🤝</span>
+        <div>
+          <p class="font-bold text-gray-800 text-sm">熊本の団体を探す</p>
+          <p class="text-xs text-gray-500 mt-0.5">地域団体・NPO・ボランティアの一覧</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+      <a href="/subsidies" class="card p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <span class="text-3xl">💰</span>
+        <div>
+          <p class="font-bold text-gray-800 text-sm">補助金・助成金を探す</p>
+          <p class="text-xs text-gray-500 mt-0.5">地域活動の資金調達に役立つ情報</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
     </div>
   </div>
 </Layout>

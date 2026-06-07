@@ -85,6 +85,12 @@ const categoryColors: Record<string, string> = {
   description={`熊本県内で活動するNPO・地域団体・ボランティア団体を地域・分野別に検索できます。まちづくり・観光交流・農林業・環境・文化・防災など${orgs.length}団体を掲載中。`}
 >
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- パンくず -->
+    <nav aria-label="パンくずリスト" class="text-sm text-gray-400 mb-6 flex items-center gap-2">
+      <a href="/" class="hover:text-gray-600">トップ</a>
+      <span>/</span>
+      <span class="text-gray-600">団体リスト</span>
+    </nav>
     <div class="mb-8">
       <h1 class="section-title">団体リスト</h1>
       <p class="section-subtitle">熊本県内で活動する団体をご紹介します</p>

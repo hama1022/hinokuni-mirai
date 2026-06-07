@@ -163,16 +163,16 @@ const categoryColors: Record<string, string> = {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {featuredOrgs.map((org) => (
-          <div class="card p-5">
+          <a href={org.subdomain ? `/organizations/${org.subdomain}` : '/organizations'} class="card p-5 block hover:shadow-md transition-shadow">
             <div class="flex items-center gap-2 mb-2">
               <span class:list={['badge', categoryColors[org.category] ?? 'bg-gray-100 text-gray-600']}>
                 {org.category}
               </span>
               <span class="text-xs text-gray-400">{org.area}</span>
             </div>
-            <h3 class="font-bold text-gray-900 mb-1">{org.name}</h3>
+            <h3 class="font-bold text-gray-900 mb-1 group-hover:text-primary-600">{org.name}</h3>
             <p class="text-sm text-gray-500 leading-relaxed">{org.description}</p>
-          </div>
+          </a>
         ))}
       </div>
     </div>

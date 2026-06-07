@@ -103,6 +103,12 @@ const breadcrumbJsonLd = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- パンくず -->
+    <nav aria-label="パンくずリスト" class="text-sm text-gray-400 mb-6 flex items-center gap-2">
+      <a href="/" class="hover:text-gray-600">トップ</a>
+      <span>/</span>
+      <span class="text-gray-600">補助金・助成金情報</span>
+    </nav>
     <div class="mb-8">
       <h1 class="section-title">補助金・助成金情報</h1>
       <p class="section-subtitle">地域活動の資金調達に役立つ情報をまとめています</p>
@@ -146,6 +152,17 @@ const breadcrumbJsonLd = {
           {cat}
         </button>
       ))}
+    </div>
+
+    <!-- 団体リストへの誘導 -->
+    <div class="bg-primary-50 border border-primary-200 rounded-xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div class="flex-1">
+        <p class="font-bold text-primary-800 mb-1">🤝 補助金を活用している団体を探す</p>
+        <p class="text-sm text-primary-700">熊本県内で活動するNPO・地域団体・ボランティア団体を分野・地域別に検索できます。</p>
+      </div>
+      <a href="/organizations" class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm">
+        団体リストを見る →
+      </a>
     </div>
 
     <div class="space-y-5" id="subsidy-list">
