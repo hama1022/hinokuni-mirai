@@ -34,18 +34,22 @@ const canonical = canonicalUrl ?? `${siteUrl}${Astro.url.pathname.replace(/\/$/,
 // OGP画像: 明示指定 → 専用OGP画像
 const ogImageUrl = ogImage ?? `${siteUrl}/ogp.png`;
 
-// ページタイトル: トップは「サイト名」のみ、他は「ページ名 | サイト名」
+// ページタイトル: トップは詳細なタイトル、他は「ページ名 | サイト名」
 const isTop = title === 'トップ';
-const pageTitle = isTop ? siteName : `${title} | ${siteName}`;
+const pageTitle = isTop
+  ? `${siteName}｜熊本県の地域づくり・NPO・ボランティア支援ポータル`
+  : `${title} | ${siteName}`;
 
 // WebSite JSON-LD（全ページ共通）
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: siteName,
+  alternateName: '火の国未来創造ネット',
   url: siteUrl,
-  description: '熊本県内の地域団体・NPO・ボランティア活動を支援するポータルサイト',
+  description: '熊本県内の地域づくり・NPO・地域団体・ボランティア活動を支援するポータルサイト',
   inLanguage: 'ja',
+  keywords: '熊本県,地域づくり,NPO,地域団体,ボランティア,まちづくり,補助金,助成金,火の国未来創造ネット',
   potentialAction: {
     '@type': 'SearchAction',
     target: `${siteUrl}/organizations?q={search_term_string}`,

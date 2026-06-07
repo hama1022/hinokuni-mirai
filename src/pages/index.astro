@@ -77,12 +77,12 @@ const categoryColors: Record<string, string> = {
       <div class="max-w-2xl">
         <p class="text-primary-400 font-medium mb-4 text-sm tracking-wide uppercase">Hinokuni Mirai</p>
         <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
-          熊本の地域活動を、<br />
+          熊本の地域づくりを、<br />
           <span class="text-primary-400">つなぎ、ひろげる。</span>
         </h1>
         <p class="text-gray-300 text-lg leading-relaxed mb-8">
-          「火の国未来創造ネット」は、熊本県内の地域団体・NPO・ボランティア活動を支援するポータルサイトです。
-          最新ニュース・団体情報・補助金情報をまとめてお届けします。
+          「火の国未来創造ネット」は、熊本県内の地域づくり・NPO・ボランティア活動を支援するポータルサイトです。
+          42団体の活動情報・補助金・助成金・最新ニュースをまとめてお届けします。
         </p>
         <div class="flex flex-wrap gap-3">
           <a href="/organizations" class="btn-primary">団体を探す</a>
@@ -108,7 +108,7 @@ const categoryColors: Record<string, string> = {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
           { icon: '📢', title: '最新ニュース', desc: '地域団体の活動報告・イベント情報・行政からのお知らせをまとめて掲載しています。', href: '/news' },
-          { icon: '🤝', title: '団体リスト', desc: '熊本県内で活動する団体を分野・地域で検索できます。仲間や連携先を見つけましょう。', href: '/organizations' },
+          { icon: '🤝', title: '団体リスト', desc: '熊本県内で地域づくりに取り組む団体を分野・地域で検索できます。仲間や連携先を見つけましょう。', href: '/organizations' },
           { icon: '💰', title: '補助金・助成金', desc: '活動資金の調達に役立つ補助金・助成金情報を随時更新しています。', href: '/subsidies' },
         ].map((item) => (
           <a href={item.href} class="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors group block">
@@ -175,6 +175,19 @@ const categoryColors: Record<string, string> = {
           </a>
         ))}
       </div>
+    </div>
+  </section>
+
+  <!-- サイト紹介（キーワード強化） -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">火の国未来創造ネットとは</h2>
+      <p class="text-gray-600 leading-relaxed text-center">
+        「火の国未来創造ネット」は、<strong>熊本県内の地域づくり</strong>を担うNPO法人・地域団体・ボランティア団体をつなぐポータルサイトです。
+        まちづくり・環境保全・福祉・観光・農林業・防災など多様な分野で活動する団体の情報を発信し、
+        地域住民・行政・企業が連携して<strong>熊本の地域課題を解決</strong>するためのプラットフォームを目指しています。
+        補助金・助成金情報も随時更新中です。
+      </p>
     </div>
   </section>
 
