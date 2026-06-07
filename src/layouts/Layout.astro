@@ -112,6 +112,15 @@ const websiteJsonLd = {
 
     <!-- ページ固有の追加head要素（JSON-LD等） -->
     <slot name="head" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJVSWVQ6NG"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YJVSWVQ6NG');
+    </script>
   </head>
   <body class="min-h-screen flex flex-col bg-gray-50">
     <Header />
