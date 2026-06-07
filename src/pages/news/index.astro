@@ -33,9 +33,39 @@ const categoryColors: Record<string, string> = {
   'トピックス': 'bg-green-100 text-green-700',
   'イベント': 'bg-orange-100 text-orange-700',
 };
+
+const siteUrl = 'https://hinokunimirai.com';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'トップ', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'ニュース', item: `${siteUrl}/news` },
+  ],
+};
+
+const itemListJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '火の国未来創造ネット ニュース一覧',
+  url: `${siteUrl}/news`,
+  numberOfItems: newsList.length,
+  itemListElement: newsList.map((news, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: `${siteUrl}/news/${news.id}`,
+    name: news.title,
+  })),
+};
 ---
 
-<Layout title="ニュース" description="熊本の地域団体・NPO・ボランティア活動に関する最新ニュース・イベント・お知らせ情報をまとめてお届けします。">
+<Layout
+  title="ニュース"
+  description="熊本県の地域団体・NPO・ボランティア活動に関する最新ニュース・イベント情報・行政からのお知らせを随時掲載。火の国未来創造ネットが熊本の地域情報をお届けします。"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListJsonLd)} slot="head" />
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-10">
       <h1 class="section-title">ニュース</h1>

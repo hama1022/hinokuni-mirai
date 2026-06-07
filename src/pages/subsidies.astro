@@ -84,9 +84,24 @@ const categoryColors: Record<string, string> = {
 
 // カテゴリ一覧（重複除去）
 const allCategories = ['すべて', ...new Set(subsidies.map((s) => s.category).filter(Boolean))];
+
+const siteUrl = 'https://hinokunimirai.com';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'トップ', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: '補助金・助成金情報', item: `${siteUrl}/subsidies` },
+  ],
+};
 ---
 
-<Layout title="補助金・助成金情報" description="熊本県内の地域団体・NPO向けの補助金・助成金情報を随時更新。市民活動・環境・福祉・農業など各分野の支援制度をまとめています。">
+<Layout
+  title="補助金・助成金情報"
+  description="熊本県内のNPO・地域団体・ボランティア活動向けの補助金・助成金情報を随時更新。市民活動・環境・福祉・農林業・まちづくりなど各分野の支援制度・申請方法をまとめています。"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-8">
       <h1 class="section-title">補助金・助成金情報</h1>

@@ -39,6 +39,31 @@ const categories = ['すべて', ...new Set(orgs.flatMap((o) => o.category ?? []
 // 地域一覧（重複除去）
 const areas = ['すべて', ...new Set(orgs.map((o) => normalizeArea(o.area)).filter(Boolean))];
 
+const siteUrl = 'https://hinokunimirai.com';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'トップ', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: '団体リスト', item: `${siteUrl}/organizations` },
+  ],
+};
+
+const itemListJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '火の国未来創造ネット 加盟団体一覧',
+  url: `${siteUrl}/organizations`,
+  numberOfItems: orgs.length,
+  itemListElement: orgs.map((org, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: org.name,
+    ...(org.subdomain && { url: `${siteUrl}/organizations/${org.subdomain}` }),
+  })),
+};
+
 const categoryColors: Record<string, string> = {
   '観光交流': 'bg-amber-100 text-amber-700',
   '産業': 'bg-blue-100 text-blue-700',
@@ -55,7 +80,10 @@ const categoryColors: Record<string, string> = {
 };
 ---
 
-<Layout title="団体リスト" description="熊本県内で活動する地域団体・NPO・ボランティア団体を分野・地域から探せます。まちづくり・福祉・環境・農業など幅広い分野の団体を掲載しています。">
+<Layout
+  title="団体リスト"
+  description={`熊本県内で活動するNPO・地域団体・ボランティア団体を地域・分野別に検索できます。まちづくり・観光交流・農林業・環境・文化・防災など${orgs.length}団体を掲載中。`}
+>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-8">
       <h1 class="section-title">団体リスト</h1>
@@ -104,6 +132,8 @@ const categoryColors: Record<string, string> = {
       </div>
     </div>
 
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListJsonLd)} slot="head" />
     <!-- 団体カード一覧 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="org-list">
       {orgs.map((org) => (
