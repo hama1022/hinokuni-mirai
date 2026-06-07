@@ -31,8 +31,8 @@ const siteName = '火の国未来創造ネット';
 // canonical: 明示指定があればそれを、なければ現在URLを正規化
 const canonical = canonicalUrl ?? `${siteUrl}${Astro.url.pathname.replace(/\/$/, '') || '/'}`;
 
-// OGP画像: 明示指定 → サイトロゴ
-const ogImageUrl = ogImage ?? `${siteUrl}/favicon-512x512.png`;
+// OGP画像: 明示指定 → 専用OGP画像
+const ogImageUrl = ogImage ?? `${siteUrl}/ogp.png`;
 
 // ページタイトル: トップは「サイト名」のみ、他は「ページ名 | サイト名」
 const isTop = title === 'トップ';
