@@ -1,70 +1,59 @@
-/**
- * hinokunimirai.com サブドメインルーター
- *
- * サブドメイン (例: nankan.hinokunimirai.com) へのアクセスを
- * メインサイトの団体詳細ページ (hinokunimirai.com/organizations/[slug])
- * にプロキシします。URL はサブドメインのまま維持されます。
- *
- * Cloudflare Workers にデプロイして使用してください。
- * Worker Route: *hinokunimirai.com/*
- */
-
 const MAIN_SITE = 'https://hinokunimirai.com';
 
-// サブドメイン → 団体スラッグ マッピング
-// microCMS に subdomain フィールドを追加した場合、このマップも更新してください
 const SUBDOMAIN_MAP = {
   'nankan': 'nankan',
-  // 例: 'tamana': 'tamana',
-  // 例: 'arao': 'arao',
 };
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    const hostname = url.hostname; // 例: nankan.hinokunimirai.com
+    const hostname = url.hostname;
 
-    // メインドメイン (www または apex) はそのままパススルー
-    if (hostname === 'hinokunimirai.com' || hostname === 'www.hinokunimirai.com') {
+    // www → 非wwwへ301リダイレクト
+    if (hostname === 'www.hinokunimirai.com') {
+      const redirectUrl = new URL(request.url);
+      redirectUrl.hostname = 'hinokunimirai.com';
+      return Response.redirect(redirectUrl.toString(), 301);
+    }
+
+    if (hostname === 'hinokunimirai.com') {
       return fetch(request);
     }
 
-    // サブドメインを抽出
     const parts = hostname.split('.');
-    if (parts.length < 3) {
-      return fetch(request);
-    }
-    const subdomain = parts[0]; // 例: 'nankan'
+    if (parts.length < 3) return fetch(request);
+    const subdomain = parts[0];
 
-    // マッピングにないサブドメインは 404
     const slug = SUBDOMAIN_MAP[subdomain];
     if (!slug) {
-      return new Response(`サブドメイン "${subdomain}" は登録されていません。`, {
+      return new Response('このサブドメインは登録されていません。', {
         status: 404,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
       });
     }
 
-    // メインサイトの団体ページへプロキシ
-    const targetPath = `/organizations/${slug}${url.pathname === '/' ? '' : url.pathname}${url.search}`;
+    // ルート(/) → 団体ページ（trailing slash付きで直接アクセスしてリダイレクトを回避）
+    // それ以外(/_astro/など) → メインサイトの同パス
+    const targetPath = (url.pathname === '/' || url.pathname === '')
+      ? `/organizations/${slug}/`
+      : url.pathname + url.search;
+
     const targetUrl = `${MAIN_SITE}${targetPath}`;
 
-    const proxyRequest = new Request(targetUrl, {
-      method: request.method,
-      headers: request.headers,
-      body: request.body,
-      redirect: 'follow',
-    });
+    const response = await fetch(targetUrl);
 
-    const response = await fetch(proxyRequest);
-
-    // レスポンスヘッダーをコピーして返す
-    const newHeaders = new Headers(response.headers);
-    newHeaders.set('X-Served-By', 'hinokunimirai-subdomain-router');
+    // content-encoding などWorkerが自動処理するヘッダーを除外して返す
+    const newHeaders = new Headers();
+    for (const [key, value] of response.headers.entries()) {
+      const lower = key.toLowerCase();
+      if (lower === 'content-encoding') continue;
+      if (lower === 'transfer-encoding') continue;
+      if (lower === 'content-length') continue;
+      newHeaders.set(key, value);
+    }
 
     return new Response(response.body, {
       status: response.status,
-      statusText: response.statusText,
       headers: newHeaders,
     });
   },
