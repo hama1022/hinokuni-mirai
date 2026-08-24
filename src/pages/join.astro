@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const siteUrl = 'https://hinokunimirai.com';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'トップ', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: '加入申込', item: `${siteUrl}/join/` },
+  ],
+};
+---
+
+<Layout
+  title="加入申込"
+  description="火の国未来創造ネットへの加入申込はこちらから。熊本県内で地域づくりに取り組む団体・個人の方のご参加をお待ちしています。"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} slot="head" />
+
+  <!-- ヒーロー -->
+  <section class="bg-primary-600 text-white py-14">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-primary-200 text-sm font-medium mb-2 tracking-wide uppercase">Join Us</p>
+      <h1 class="text-3xl md:text-4xl font-bold mb-4">加入申込</h1>
+      <p class="text-primary-100 text-lg leading-relaxed">
+        「火の国未来創造ネット」への加入を希望される団体・個人の方は、<br class="hidden sm:inline" />
+        下記のフォームよりお申し込みください。
+      </p>
+    </div>
+  </section>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- パンくず -->
+    <nav aria-label="パンくずリスト" class="text-sm text-gray-400 mb-8 flex items-center gap-2">
+      <a href="/" class="hover:text-gray-600">トップ</a>
+      <span>/</span>
+      <span class="text-gray-600">加入申込</span>
+    </nav>
+
+    <!-- 加入メリット -->
+    <section class="card p-8 mb-8">
+      <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-2xl">🤝</span> 加入のメリット
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {[
+          { icon: '📢', text: '活動情報・イベント情報をサイトに掲載' },
+          { icon: '💰', text: '補助金・助成金情報をいち早く入手' },
+          { icon: '🌐', text: '県内の地域づくり団体とのネットワーク形成' },
+          { icon: '📋', text: '各種研修・交流会への参加機会' },
+        ].map((item) => (
+          <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <span class="text-2xl flex-shrink-0">{item.icon}</span>
+            <p class="text-gray-700 text-sm leading-relaxed">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 申込フォーム -->
+    <section class="card overflow-hidden mb-8">
+      <div class="bg-gray-50 px-8 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <span class="text-xl">📝</span> 申込フォーム
+        </h2>
+      </div>
+      <div class="p-4">
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSfd7zIu8HqixG5YbSsw6-gOodDVt-4vzfpplOj3sieZf-6SaA/viewform?embedded=true"
+          width="100%"
+          height="900"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          class="w-full"
+          title="加入申込フォーム"
+          loading="lazy"
+        >
+          読み込んでいます…
+        </iframe>
+      </div>
+    </section>
+
+    <!-- フォームが表示されない場合 -->
+    <div class="text-center mb-10">
+      <p class="text-sm text-gray-500 mb-3">フォームが表示されない場合はこちら</p>
+      <a
+        href="https://forms.gle/sZujoLRjY7KxYBrE6"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-primary inline-flex items-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+        申込フォームを別タブで開く
+      </a>
+    </div>
+
+    <!-- お問い合わせ誘導 -->
+    <div class="text-center text-sm text-gray-500">
+      ご不明な点は<a href="/contact" class="text-primary-600 hover:underline">お問い合わせ</a>からお気軽にご連絡ください。
+    </div>
+
+  </div>
+</Layout>
